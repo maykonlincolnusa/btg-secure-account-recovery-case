@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
-import { apiRequest, type AdminRecoveryRequest } from "../../lib/api";
+import { apiRequest, demoAdminRequest, type AdminRecoveryRequest } from "../../lib/api";
 import { StatusPill } from "../../components/status-pill";
 
 export default function AdminRecoveryPage() {
@@ -23,7 +23,14 @@ export default function AdminRecoveryPage() {
   }
 
   useEffect(() => {
-    void load().catch((err) => setError(err instanceof Error ? err.message : "Erro ao carregar"));
+    void load().catch((err) => {
+      setRows([demoAdminRequest]);
+      setError(
+        err instanceof Error
+          ? `API offline ou indisponivel: ${err.message}. Exibindo dados demo.`
+          : "API offline ou indisponivel. Exibindo dados demo."
+      );
+    });
   }, []);
 
   return (

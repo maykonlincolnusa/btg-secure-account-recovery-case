@@ -21,6 +21,99 @@ export type AdminRecoveryRequest = {
   createdAt: string;
 };
 
+export const demoAdminRequest: AdminRecoveryRequest = {
+  protocolId: "SR-20260430-DEMO01",
+  status: "UNDER_REVIEW",
+  targetEmailMasked: "no***@example.com",
+  targetPhoneMasked: "+55******2222",
+  cooldownUntil: null,
+  user: {
+    accountIdentifier: "demo-account-001",
+    maskedEmail: "jo***@example.com",
+    maskedPhone: "+55******0001"
+  },
+  riskAssessments: [
+    {
+      riskScore: 70,
+      riskLevel: "HIGH",
+      suggestedDecision: "HOLD",
+      reasons: [
+        {
+          code: "NEW_DEVICE",
+          description: "Dispositivo nao reconhecido",
+          weight: 15
+        },
+        {
+          code: "UNUSUAL_IP",
+          description: "IP incomum para a conta",
+          weight: 20
+        },
+        {
+          code: "SENSITIVE_CONTACT_CHANGE",
+          description: "Alteracao de dados sensiveis solicitada",
+          weight: 15
+        },
+        {
+          code: "RECENT_RECOVERY_REQUESTS",
+          description: "Solicitacoes recentes para a mesma conta",
+          weight: 20
+        }
+      ],
+      signals: {
+        newDevice: true,
+        unusualIp: true,
+        sensitiveContactChange: true,
+        recentRecoveryRequests: 3
+      },
+      createdAt: new Date().toISOString()
+    }
+  ],
+  auditEvents: [
+    {
+      action: "RECOVERY_REQUEST_CREATED",
+      summary: "Solicitacao criada com dados mascarados",
+      actorType: "USER",
+      createdAt: new Date().toISOString(),
+      metadata: {}
+    },
+    {
+      action: "RISK_ASSESSED",
+      summary: "Risco HIGH com decisao HOLD",
+      actorType: "SYSTEM",
+      createdAt: new Date().toISOString(),
+      metadata: { riskScore: 70 }
+    }
+  ],
+  statusHistory: [
+    {
+      fromStatus: "INITIATED",
+      toStatus: "IDENTITY_PENDING",
+      reason: "Solicitacao criada com consentimento",
+      createdAt: new Date().toISOString()
+    },
+    {
+      fromStatus: "RISK_EVALUATING",
+      toStatus: "UNDER_REVIEW",
+      reason: "Risco alto encaminhado para revisao manual",
+      createdAt: new Date().toISOString()
+    }
+  ],
+  manualDecisions: [
+    {
+      decision: "NOTE",
+      operatorId: "operator-demo",
+      reason: "Nota operacional",
+      note: "Caso demonstrativo para avaliacao do fluxo administrativo.",
+      createdAt: new Date().toISOString()
+    }
+  ],
+  createdAt: new Date().toISOString()
+};
+
+export function getDemoAdminRequest(protocolId: string): AdminRecoveryRequest {
+  return { ...demoAdminRequest, protocolId };
+}
+
 export async function apiRequest<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...init,

@@ -3,7 +3,7 @@
 import { Check, FileText, X } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { apiRequest, type AdminRecoveryRequest } from "../../../lib/api";
+import { apiRequest, getDemoAdminRequest, type AdminRecoveryRequest } from "../../../lib/api";
 import { StatusPill } from "../../../components/status-pill";
 
 export default function AdminRecoveryDetailPage() {
@@ -32,7 +32,14 @@ export default function AdminRecoveryDetailPage() {
   }
 
   useEffect(() => {
-    void load().catch((err) => setError(err instanceof Error ? err.message : "Erro ao carregar"));
+    void load().catch((err) => {
+      setData(getDemoAdminRequest(protocolId));
+      setError(
+        err instanceof Error
+          ? `API offline ou indisponivel: ${err.message}. Exibindo detalhe demo.`
+          : "API offline ou indisponivel. Exibindo detalhe demo."
+      );
+    });
   }, [protocolId]);
 
   if (!data) {
