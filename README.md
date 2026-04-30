@@ -13,6 +13,16 @@ Todos os serviços externos são abstraídos por interfaces e usam mocks por pad
 - `MockNotificationProvider`
 - `RuleBasedRiskEngine`
 
+## Admin em modo demo offline
+
+O painel administrativo também possui um fallback de demonstração. Quando a API backend está offline ou indisponível, a tela mostra uma mensagem explícita e carrega uma solicitação demo para que a interface possa ser avaliada sem Postgres, Redis ou serviços locais ativos.
+
+Esse comportamento é intencional para apresentações e revisão visual do protótipo. Em ambiente real, a mensagem deve desaparecer quando a API estiver ativa em `http://localhost:3001` e o admin passará a consumir os dados persistidos.
+
+![Painel administrativo em modo demo offline](https://github.com/maykonlincolnusa/btg-secure-account-recovery-case/blob/main/docs/assets/admin-demo-offline.jpeg?raw=true)
+
+Imagem versionada no repositório: [`docs/assets/admin-demo-offline.jpeg`](docs/assets/admin-demo-offline.jpeg).
+
 ## Problema Resolvido
 
 Alterar dados sensíveis de contato em contexto bancário exige evidência de identidade, prova de presença, avaliação de risco, proteção contra replay, trilha auditável e separação clara entre automação e revisão humana. Esta base demonstra como organizar esses requisitos sem acoplar o produto a sistemas internos reais.
@@ -113,16 +123,6 @@ Regra central: nenhuma alteração de e-mail ou telefone ocorre antes de FaceMat
 4. Consulta risco, histórico e auditoria.
 5. Aprova, rejeita ou adiciona nota operacional.
 6. Cada ação gera evento auditável.
-
-### Admin em modo demo offline
-
-O painel administrativo também possui um fallback de demonstração. Quando a API backend está offline ou indisponível, a tela mostra uma mensagem explícita e carrega uma solicitação demo para que a interface possa ser avaliada sem Postgres, Redis ou serviços locais ativos.
-
-Esse comportamento é intencional para apresentações e revisão visual do protótipo. Em ambiente real, a mensagem deve desaparecer quando a API estiver ativa em `http://localhost:3001` e o admin passará a consumir os dados persistidos.
-
-![Painel administrativo em modo demo offline](https://github.com/maykonlincolnusa/btg-secure-account-recovery-case/blob/main/docs/assets/admin-demo-offline.jpeg?raw=true)
-
-Imagem versionada no repositório: [`docs/assets/admin-demo-offline.jpeg`](docs/assets/admin-demo-offline.jpeg).
 
 ## Motor de Risco
 
