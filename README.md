@@ -120,7 +120,9 @@ O painel administrativo também possui um fallback de demonstração. Quando a A
 
 Esse comportamento é intencional para apresentações e revisão visual do protótipo. Em ambiente real, a mensagem deve desaparecer quando a API estiver ativa em `http://localhost:3001` e o admin passará a consumir os dados persistidos.
 
-![Painel administrativo em modo demo offline](docs/assets/admin-demo-offline.jpeg)
+![Painel administrativo em modo demo offline](https://github.com/maykonlincolnusa/btg-secure-account-recovery-case/blob/main/docs/assets/admin-demo-offline.jpeg?raw=true)
+
+Imagem versionada no repositório: [`docs/assets/admin-demo-offline.jpeg`](docs/assets/admin-demo-offline.jpeg).
 
 ## Motor de Risco
 
