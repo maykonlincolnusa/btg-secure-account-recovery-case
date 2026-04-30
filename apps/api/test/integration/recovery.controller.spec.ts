@@ -22,10 +22,12 @@ describe("RecoveryController", () => {
     const moduleRef = await Test.createTestingModule({
       controllers: [RecoveryController],
       providers: [
-        { provide: RecoveryService, useValue: recoveryService },
-        { provide: ThrottlerGuard, useValue: { canActivate: () => true } }
+        { provide: RecoveryService, useValue: recoveryService }
       ]
-    }).compile();
+    })
+      .overrideGuard(ThrottlerGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     app = moduleRef.createNestApplication();
     await app.init();
@@ -33,7 +35,9 @@ describe("RecoveryController", () => {
   });
 
   afterEach(async () => {
-    await app.close();
+    if (app) {
+      await app.close();
+    }
   });
 
   it("creates a recovery request", async () => {

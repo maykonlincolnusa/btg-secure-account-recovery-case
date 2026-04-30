@@ -231,7 +231,11 @@ export class RecoveryService {
 
   async submit(protocolId: string, requestId?: string) {
     const request = await this.findDetailed(protocolId);
-    if ([RecoveryStatus.COOLDOWN, RecoveryStatus.UNDER_REVIEW, RecoveryStatus.APPROVED].includes(request.status)) {
+    if (
+      request.status === RecoveryStatus.COOLDOWN ||
+      request.status === RecoveryStatus.UNDER_REVIEW ||
+      request.status === RecoveryStatus.APPROVED
+    ) {
       await this.audit.record({
         recoveryRequestId: request.id,
         actorType: "USER",
@@ -314,7 +318,11 @@ export class RecoveryService {
 
   async approve(protocolId: string, operatorId: string, reason: string, note?: string, requestId?: string) {
     const request = await this.findDetailed(protocolId);
-    if (![RecoveryStatus.UNDER_REVIEW, RecoveryStatus.COOLDOWN, RecoveryStatus.STEP_UP_REQUIRED].includes(request.status)) {
+    if (
+      request.status !== RecoveryStatus.UNDER_REVIEW &&
+      request.status !== RecoveryStatus.COOLDOWN &&
+      request.status !== RecoveryStatus.STEP_UP_REQUIRED
+    ) {
       throw new ConflictException("Aprovação manual permitida apenas para revisão, cooldown ou step-up");
     }
     await this.transition(request.id, request.status, RecoveryStatus.APPROVED, reason, undefined, "OPERATOR", operatorId);
@@ -335,7 +343,10 @@ export class RecoveryService {
 
   async reject(protocolId: string, operatorId: string, reason: string, note?: string, requestId?: string) {
     const request = await this.findDetailed(protocolId);
-    if ([RecoveryStatus.COMPLETED, RecoveryStatus.REJECTED].includes(request.status)) {
+    if (
+      request.status === RecoveryStatus.COMPLETED ||
+      request.status === RecoveryStatus.REJECTED
+    ) {
       throw new ConflictException("Solicitação terminal não pode ser rejeitada novamente");
     }
     await this.transition(request.id, request.status, RecoveryStatus.REJECTED, reason, undefined, "OPERATOR", operatorId);
@@ -459,7 +470,11 @@ export class RecoveryService {
   }
 
   private ensureNotTerminal(status: RecoveryStatus) {
-    if ([RecoveryStatus.REJECTED, RecoveryStatus.COMPLETED, RecoveryStatus.FAILED].includes(status)) {
+    if (
+      status === RecoveryStatus.REJECTED ||
+      status === RecoveryStatus.COMPLETED ||
+      status === RecoveryStatus.FAILED
+    ) {
       throw new ConflictException("Solicitação já está em estado terminal");
     }
   }

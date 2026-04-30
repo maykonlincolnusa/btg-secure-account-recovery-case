@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Headers, Param, Post, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Headers, Inject, Param, Post, Req, UseGuards } from "@nestjs/common";
 import { ApiHeader, ApiOperation, ApiTags } from "@nestjs/swagger";
 import type { Request } from "express";
 import { ThrottlerGuard } from "@nestjs/throttler";
@@ -13,7 +13,7 @@ import { ContactChangeDto } from "./dto/contact-change.dto";
 @UseGuards(ThrottlerGuard)
 @Controller("recovery/requests")
 export class RecoveryController {
-  constructor(private readonly recovery: RecoveryService) {}
+  constructor(@Inject(RecoveryService) private readonly recovery: RecoveryService) {}
 
   @Post()
   @ApiOperation({ summary: "Cria solicitação de recuperação" })

@@ -22,11 +22,15 @@ export default function RecoveryDetailPage() {
     setBusy(label);
     setError(null);
     try {
-      const data = await apiRequest<RecoverySummary>(path, {
+      const init: RequestInit = {
         method: "POST",
-        body: body ? JSON.stringify(body) : undefined,
         headers: { "Idempotency-Key": `${label}-${protocolId}` }
-      });
+      };
+      if (body) {
+        init.body = JSON.stringify(body);
+      }
+
+      const data = await apiRequest<RecoverySummary>(path, init);
       setRequest(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro na ação");
