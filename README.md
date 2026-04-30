@@ -114,6 +114,14 @@ Regra central: nenhuma alteração de e-mail ou telefone ocorre antes de FaceMat
 5. Aprova, rejeita ou adiciona nota operacional.
 6. Cada ação gera evento auditável.
 
+### Admin em modo demo offline
+
+O painel administrativo também possui um fallback de demonstração. Quando a API backend está offline ou indisponível, a tela mostra uma mensagem explícita e carrega uma solicitação demo para que a interface possa ser avaliada sem Postgres, Redis ou serviços locais ativos.
+
+Esse comportamento é intencional para apresentações e revisão visual do protótipo. Em ambiente real, a mensagem deve desaparecer quando a API estiver ativa em `http://localhost:3001` e o admin passará a consumir os dados persistidos.
+
+![Painel administrativo em modo demo offline](docs/assets/admin-demo-offline.jpeg)
+
 ## Motor de Risco
 
 `RuleBasedRiskEngine` usa sinais estruturados:
