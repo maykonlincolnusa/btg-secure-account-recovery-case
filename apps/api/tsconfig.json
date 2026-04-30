@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "outDir": "dist",
+    "rootDir": "src",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "types": ["node"],
+    "exactOptionalPropertyTypes": false,
+    "baseUrl": "../..",
+    "paths": {
+      "@secure-recovery/domain": ["packages/domain/dist/index.d.ts"],
+      "@secure-recovery/contracts": ["packages/contracts/dist/index.d.ts"],
+      "@secure-recovery/utils": ["packages/utils/dist/index.d.ts"],
+      "@secure-recovery/config": ["packages/config/dist/index.d.ts"]
+    }
+  },
+  "include": ["src/**/*.ts"]
+}

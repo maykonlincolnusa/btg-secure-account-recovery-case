@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@secure-recovery/domain": ["packages/domain/src/index.ts"],
+      "@secure-recovery/domain/*": ["packages/domain/src/*"],
+      "@secure-recovery/contracts": ["packages/contracts/src/index.ts"],
+      "@secure-recovery/contracts/*": ["packages/contracts/src/*"],
+      "@secure-recovery/utils": ["packages/utils/src/index.ts"],
+      "@secure-recovery/config": ["packages/config/src/index.ts"],
+      "@secure-recovery/ui": ["packages/ui/src/index.ts"]
+    }
+  }
+}

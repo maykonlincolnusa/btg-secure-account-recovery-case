@@ -1,0 +1,68 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: secure_recovery
+      POSTGRES_USER: secure_recovery
+      POSTGRES_PASSWORD: secure_recovery
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U secure_recovery -d secure_recovery"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ../..
+      dockerfile: infra/docker/api.Dockerfile
+    env_file:
+      - ../../.env.example
+    environment:
+      DATABASE_URL: postgresql://secure_recovery:secure_recovery@postgres:5432/secure_recovery?schema=public
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ../..
+      dockerfile: infra/docker/web.Dockerfile
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:3001
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+  admin:
+    build:
+      context: ../..
+      dockerfile: infra/docker/admin.Dockerfile
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:3001
+    ports:
+      - "3002:3002"
+    depends_on:
+      - api
+
+volumes:
+  postgres-data:

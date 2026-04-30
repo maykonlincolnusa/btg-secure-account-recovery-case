@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RecoveryStatus {
+  INITIATED
+  IDENTITY_PENDING
+  FACE_VERIFIED
+  LIVENESS_VERIFIED
+  RISK_EVALUATING
+  STEP_UP_REQUIRED
+  UNDER_REVIEW
+  COOLDOWN
+  APPROVED
+  REJECTED
+  COMPLETED
+  FAILED
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum SuggestedDecision {
+  AUTO_APPROVE
+  STEP_UP
+  HOLD
+  REJECT
+}
+
+model User {
+  id                String            @id @default(cuid())
+  accountIdentifier String            @unique
+  maskedEmail       String?
+  maskedPhone       String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  recoveryRequests  RecoveryRequest[]
+}
+
+model RecoveryRequest {
+  id                   String                 @id @default(cuid())
+  protocolId           String                 @unique
+  userId               String
+  user                 User                   @relation(fields: [userId], references: [id])
+  status               RecoveryStatus
+  targetEmailMasked    String?
+  targetPhoneMasked    String?
+  previousEmailMasked  String?
+  previousPhoneMasked  String?
+  idempotencyKey       String?
+  consentAcceptedAt    DateTime?
+  cooldownUntil        DateTime?
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  completedAt          DateTime?
+  verificationAttempts VerificationAttempt[]
+  riskAssessments      RiskAssessment[]
+  auditEvents          AuditEvent[]
+  statusHistory        StatusHistory[]
+  notifications        NotificationEvent[]
+  manualDecisions      ManualReviewDecision[]
+  contactChange        ContactChangeRequest?
+
+  @@index([status, createdAt])
+  @@index([userId, createdAt])
+}
+
+model VerificationAttempt {
+  id                String          @id @default(cuid())
+  recoveryRequestId String
+  recoveryRequest   RecoveryRequest @relation(fields: [recoveryRequestId], references: [id])
+  type              String
+  provider          String
+  success           Boolean
+  score             Int?
+  reasonCode        String?
+  metadata          Json
+  createdAt         DateTime        @default(now())
+}
+
+model RiskAssessment {
+  id                String            @id @default(cuid())
+  recoveryRequestId String
+  recoveryRequest   RecoveryRequest   @relation(fields: [recoveryRequestId], references: [id])
+  riskScore         Int
+  riskLevel         RiskLevel
+  suggestedDecision SuggestedDecision
+  reasons           Json
+  signals           Json
+  createdAt         DateTime          @default(now())
+}
+
+model AuditEvent {
+  id                String          @id @default(cuid())
+  recoveryRequestId String?
+  recoveryRequest   RecoveryRequest? @relation(fields: [recoveryRequestId], references: [id])
+  actorType         String
+  actorId           String?
+  action            String
+  summary           String
+  metadata          Json
+  requestId         String?
+  createdAt         DateTime        @default(now())
+
+  @@index([recoveryRequestId, createdAt])
+}
+
+model StatusHistory {
+  id                String          @id @default(cuid())
+  recoveryRequestId String
+  recoveryRequest   RecoveryRequest @relation(fields: [recoveryRequestId], references: [id])
+  fromStatus        RecoveryStatus?
+  toStatus          RecoveryStatus
+  reason            String
+  actorType         String
+  actorId           String?
+  createdAt         DateTime        @default(now())
+}
+
+model NotificationEvent {
+  id                String          @id @default(cuid())
+  recoveryRequestId String
+  recoveryRequest   RecoveryRequest @relation(fields: [recoveryRequestId], references: [id])
+  channel           String
+  template          String
+  recipientMasked   String
+  status            String
+  metadata          Json
+  createdAt         DateTime        @default(now())
+}
+
+model ManualReviewDecision {
+  id                String          @id @default(cuid())
+  recoveryRequestId String
+  recoveryRequest   RecoveryRequest @relation(fields: [recoveryRequestId], references: [id])
+  decision          String
+  operatorId        String
+  reason            String
+  note              String?
+  createdAt         DateTime        @default(now())
+}
+
+model ContactChangeRequest {
+  id                String          @id @default(cuid())
+  recoveryRequestId String          @unique
+  recoveryRequest   RecoveryRequest @relation(fields: [recoveryRequestId], references: [id])
+  newEmailMasked    String
+  newPhoneMasked    String
+  status            String
+  executedAt        DateTime?
+  createdAt         DateTime        @default(now())
+}
+
+model IdempotencyKey {
+  key          String   @id
+  scope        String
+  responseHash String
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  @@index([expiresAt])
+}

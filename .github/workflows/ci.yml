@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: secure_recovery
+          POSTGRES_USER: secure_recovery
+          POSTGRES_PASSWORD: secure_recovery
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U secure_recovery -d secure_recovery"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+    env:
+      DATABASE_URL: postgresql://secure_recovery:secure_recovery@localhost:5432/secure_recovery?schema=public
+      REDIS_URL: redis://localhost:6379
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm install
+      - run: npm run db:generate
+      - run: npm run build
+      - run: npm run test
